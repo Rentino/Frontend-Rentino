@@ -14,7 +14,8 @@ import { gearItems as mockGear, reviews as mockReviews } from "@/lib/content";
 import { formatNumber } from "@/lib/format";
 import type { GearItem } from "@/types";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
 
 type ReviewData = {
   id: string;
@@ -70,7 +71,16 @@ export default async function GearDetailsPage({
 }) {
   const { slug } = await params;
 
-  const backend = await fetchFromBackend(slug);
+  // Next.js hands dynamic segments over percent-encoded. Persian gear slugs
+  // (from Persian titles) would never match the API value otherwise.
+  let decodedSlug = slug;
+  try {
+    decodedSlug = decodeURIComponent(slug);
+  } catch {
+    // keep the raw value when it is not valid percent-encoding
+  }
+
+  const backend = await fetchFromBackend(decodedSlug);
 
   let gear: GearItem;
   let gearReviews: ReviewData[];
@@ -82,7 +92,7 @@ export default async function GearDetailsPage({
     related = backend.related;
   } else {
     // Backend not available — fall back to bundled demo data.
-    const mock = mockGear.find((g) => g.slug === slug);
+    const mock = mockGear.find((g) => g.slug === decodedSlug);
     if (!mock) notFound();
 
     gear = mock;

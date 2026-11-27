@@ -55,10 +55,7 @@ export default function AdminBlogPage() {
   // useApiList may return undefined before the API response arrives.
   // Always keep posts as an array.
   const posts = data ?? [];
-  console.log("FILTER:", status);
-  console.log("QUERY:", query);
-  console.log("POSTS:", posts);
-  console.log("META:", meta);
+
   const togglePublish = async (post: BlogPost) => {
     try {
       await api.patch(
