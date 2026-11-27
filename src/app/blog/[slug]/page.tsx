@@ -27,12 +27,26 @@ interface BlogResponse {
 }
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
+
+/**
+ * Next.js hands dynamic segments over already percent-encoded, so a Persian
+ * slug like «آزمون-وبلاگ» arrives as `%D8%A2...`. Encoding that again would
+ * double-encode it and the API would answer 404. Decode once (safely) and then
+ * encode exactly once for the request.
+ */
+function normalizeSlug(slug: string): string {
+  try {
+    return encodeURIComponent(decodeURIComponent(slug));
+  } catch {
+    return encodeURIComponent(slug);
+  }
+}
 
 async function getBlogPost(slug: string): Promise<BlogPost | null> {
   try {
     const response = await fetch(
-      `${API_BASE_URL}/blog/${encodeURIComponent(slug)}`,
+      `${API_BASE_URL}/blog/${normalizeSlug(slug)}`,
       {
         cache: "no-store",
       },
@@ -66,8 +80,15 @@ export default async function BlogPostPage({
 
   const livePost = await getBlogPost(slug);
 
-  // Backend not available — fall back to bundled demo post.
-  const mock = mockBlogPosts.find((p) => p.slug === slug);
+  // Backend not available — fall back to bundled demo post. `slug` arrives
+  // percent-encoded, so compare against its decoded form.
+  let decodedSlug = slug;
+  try {
+    decodedSlug = decodeURIComponent(slug);
+  } catch {
+    // keep the raw value when it is not valid percent-encoding
+  }
+  const mock = mockBlogPosts.find((p) => p.slug === decodedSlug);
 
   const post: BlogPost | null =
     livePost ??

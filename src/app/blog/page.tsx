@@ -27,7 +27,7 @@ interface BlogResponse {
 }
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
 
 async function getBlogPosts(): Promise<BlogPost[]> {
   try {

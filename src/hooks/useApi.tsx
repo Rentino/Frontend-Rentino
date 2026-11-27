@@ -10,9 +10,15 @@ export interface Meta {
   totalPages: number;
 }
 
-interface ListResponse<T> {
-  data: T[];
-  meta: Meta;
+/**
+ * The API answers with `{ success, message, data, meta? }`. `api.get` returns
+ * that envelope as-is, so the hooks unwrap `data` before handing it to callers.
+ */
+interface Envelope<T> {
+  success: boolean;
+  message: string;
+  data: T;
+  meta?: Meta;
 }
 
 export function useApi<T>(path: string | null) {
@@ -33,10 +39,10 @@ export function useApi<T>(path: string | null) {
 
     async function load() {
       try {
-        const result = await api.get<T>(currentPath);
+        const result = await api.get<Envelope<T>>(currentPath);
 
         if (!cancelled) {
-          setData(result);
+          setData(result.data);
           setError(null);
         }
       } catch (err) {
@@ -93,10 +99,10 @@ export function useApiList<T>(path: string | null) {
 
     async function load() {
       try {
-        const result = await api.get<ListResponse<T>>(currentPath);
+        const result = await api.get<Envelope<T[]>>(currentPath);
 
         if (!cancelled) {
-          setData(result.data);
+          setData(Array.isArray(result.data) ? result.data : []);
           setMeta(result.meta);
           setError(null);
         }

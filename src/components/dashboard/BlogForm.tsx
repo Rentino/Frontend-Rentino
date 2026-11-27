@@ -106,9 +106,12 @@ export function BlogForm({ existing }: { existing?: BlogPost }) {
     }
 
     // Create new post
-    const created = await api.post<{ id: string }>("/admin/blog", payload);
+    const created = await api.post<{ success: boolean; data: { id: string } }>(
+      "/admin/blog",
+      payload,
+    );
 
-    return created.id;
+    return created.data.id;
   };
 
   // -----------------------------------------
