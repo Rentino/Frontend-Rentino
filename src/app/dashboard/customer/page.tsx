@@ -28,7 +28,6 @@ import { api, type ApiResponse } from "@/lib/api";
 
 import { formatJalali, formatNumber, formatToman } from "@/lib/format";
 import { paymentStatusLabel, rentalStatusLabel } from "@/lib/labels";
-import { paymentHistory, rentalOrders } from "@/lib/content";
 
 import type { RentalStatus } from "@/types";
 
@@ -210,36 +209,6 @@ function toPaymentHistory(payment: ApiPayment): PaymentHistoryItem {
 }
 
 /* =========================================================
-   FIXTURE MAPPERS (backend unavailable → demo data)
-========================================================= */
-
-function toRentalOrderFromFixture(
-  fixture: (typeof rentalOrders)[number],
-): RentalOrder {
-  return {
-    id: fixture.id,
-    gearTitle: fixture.gearTitle,
-    startDate: fixture.startDate,
-    endDate: fixture.endDate,
-    totalAmount: fixture.totalAmount,
-    status: fixture.status,
-  };
-}
-
-function toPaymentHistoryFromFixture(
-  fixture: (typeof paymentHistory)[number],
-): PaymentHistoryItem {
-  return {
-    id: fixture.id,
-    transactionId: fixture.transactionId,
-    method: fixture.method,
-    amount: fixture.amount,
-    status: fixture.status,
-    paidAt: fixture.paidAt,
-  };
-}
-
-/* =========================================================
    TABLE SKELETON
 ========================================================= */
 
@@ -369,11 +338,7 @@ export default function CustomerOverviewPage() {
 
         const rentalArray = Array.isArray(rentalData) ? rentalData : [];
 
-        setRentals(
-          rentalArray.length > 0
-            ? rentalArray.map(toRentalOrder)
-            : rentalOrders.map(toRentalOrderFromFixture),
-        );
+        setRentals(rentalArray.map(toRentalOrder));
 
         /* -----------------------------------------------
            PAYMENTS
@@ -384,18 +349,13 @@ export default function CustomerOverviewPage() {
 
         const paymentArray = Array.isArray(paymentData) ? paymentData : [];
 
-        setPayments(
-          paymentArray.length > 0
-            ? paymentArray.map(toPaymentHistory)
-            : paymentHistory.map(toPaymentHistoryFromFixture),
-        );
+        setPayments(paymentArray.map(toPaymentHistory));
       } catch {
         if (!active) return;
 
-        // Backend unavailable — render the demo fixtures.
-        setRentals(rentalOrders.map(toRentalOrderFromFixture));
-        setPayments(paymentHistory.map(toPaymentHistoryFromFixture));
-        setError(null);
+        setRentals([]);
+        setPayments([]);
+        setError("دریافت اطلاعات ناموفق بود.");
       } finally {
         if (active) {
           setLoading(false);

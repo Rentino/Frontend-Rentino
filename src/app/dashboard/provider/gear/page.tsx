@@ -31,7 +31,6 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { api, ApiRequestError } from "@/lib/api";
-import { gearItems } from "@/lib/content";
 import { formatNumber, formatToman } from "@/lib/format";
 import { toGearItem, type ApiGear } from "@/lib/gear";
 import { availabilityLabel } from "@/lib/labels";
@@ -150,7 +149,7 @@ export default function ProviderInventoryPage() {
 
         if (!mounted) return;
 
-        setItems(gearItems);
+        setItems([]);
       } finally {
         if (mounted) {
           setLoading(false);

@@ -5,7 +5,6 @@ import { useParams } from "next/navigation";
 
 import { GearForm } from "@/components/gear/gear-form";
 import { api } from "@/lib/api";
-import { gearItems } from "@/lib/content";
 import { toGearItem, type ApiGear } from "@/lib/gear";
 import type { GearItem } from "@/types";
 
@@ -146,13 +145,13 @@ export default function EditGearPage() {
         const found = items.map(toGearItem).find((item) => item.id === id);
 
         if (!found) {
-          setGear(gearItems.find((item) => item.id === id) ?? null);
+          setGear(null);
           return;
         }
 
         setGear(found);
       } catch {
-        setGear(gearItems.find((item) => item.id === id) ?? null);
+        setGear(null);
       } finally {
         setLoading(false);
       }

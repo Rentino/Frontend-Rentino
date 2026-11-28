@@ -32,7 +32,6 @@ import { OrderStatusBadge } from "@/components/order-status-badge";
 import { api, ApiRequestError } from "@/lib/api";
 
 import { formatJalali, formatNumber, formatToman, toFaDigits } from "@/lib/format";
-import { rentalOrders } from "@/lib/content";
 
 import type { RentalStatus } from "@/types";
 
@@ -91,22 +90,6 @@ function getGearName(gear: GearItem) {
 
 function getGearImage(gear: GearItem) {
   return gear.image || gear.images?.[0] || null;
-}
-
-function fixtureToOrder(fixture: (typeof rentalOrders)[number]): CustomerOrder {
-  return {
-    id: fixture.id,
-    startDate: fixture.startDate,
-    endDate: fixture.endDate,
-    totalAmount: fixture.totalAmount,
-    status: fixture.status,
-    items: [
-      {
-        gearItemId: fixture.id,
-        gearItem: { id: fixture.id, name: fixture.gearTitle },
-      },
-    ],
-  };
 }
 
 /* =========================================================
@@ -214,14 +197,12 @@ export default function CustomerOrdersPage() {
 
         const fetched = getOrders(response);
 
-        setOrders(
-          fetched.length > 0 ? fetched : rentalOrders.map(fixtureToOrder),
-        );
+        setOrders(fetched);
       } catch {
         if (!mounted) return;
 
-        // Backend unavailable — render the demo fixtures.
-        setOrders(rentalOrders.map(fixtureToOrder));
+        // Leave the list empty when the request fails.
+        setOrders([]);
       } finally {
         if (mounted) {
           setLoading(false);

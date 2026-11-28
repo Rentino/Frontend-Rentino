@@ -20,7 +20,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { OrderStatusBadge } from "@/components/order-status-badge";
 
 import { api, ApiRequestError } from "@/lib/api";
-import { rentalOrders } from "@/lib/content";
 import { formatJalaliRange, formatNumber, formatToman } from "@/lib/format";
 import type { RentalStatus } from "@/types";
 
@@ -339,8 +338,6 @@ export default function ProviderOrdersPage() {
 
         const rawOrders = extractOrders(response);
 
-        console.log("EXTRACTED ORDERS:", rawOrders);
-
         const normalizedOrders = rawOrders.map(normalizeOrder);
 
         setOrders(normalizedOrders);
@@ -351,7 +348,7 @@ export default function ProviderOrdersPage() {
           return;
         }
 
-        setOrders(rentalOrders);
+        setOrders([]);
       } finally {
         if (mounted) {
           setLoading(false);

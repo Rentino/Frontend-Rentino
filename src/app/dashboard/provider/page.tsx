@@ -33,7 +33,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 import { api, type ApiResponse } from "@/lib/api";
 
-import { gearItems, rentalOrders } from "@/lib/content";
 import { formatJalaliRange, formatNumber, formatToman } from "@/lib/format";
 
 import type { RentalStatus } from "@/types";
@@ -87,66 +86,6 @@ const emptyDashboard: ProviderDashboard = {
   recentOrders: [],
   orders: [],
 };
-
-// =========================
-// Demo fallback (backend unavailable)
-// =========================
-
-const mockDashboard: ProviderDashboard = (() => {
-  const activeRentals = gearItems.filter(
-    (g) => g.availability === "RENTED",
-  ).length;
-
-  const pendingOrders = rentalOrders.filter(
-    (o) => o.status !== "RETURNED" && o.status !== "CANCELLED",
-  ).length;
-
-  const totalRevenue = rentalOrders.reduce(
-    (sum, o) => sum + o.totalAmount,
-    0,
-  );
-
-  const averageRating =
-    gearItems.length > 0
-      ? gearItems.reduce((sum, g) => sum + g.rating, 0) / gearItems.length
-      : 0;
-
-  const months = [
-    "فروردین",
-    "اردیبهشت",
-    "خرداد",
-    "تیر",
-    "مرداد",
-    "شهریور",
-  ];
-
-  const revenueByMonth: RevenuePoint[] = months.map((month, index) => ({
-    month,
-    revenue: Math.round((totalRevenue / 6) * (0.5 + (index + 1) * 0.2)),
-  }));
-
-  return {
-    totalGear: gearItems.length,
-    gearListed: gearItems.length,
-    activeRentals,
-    pendingOrders,
-    totalRevenue,
-    revenue30d: totalRevenue,
-    averageRating,
-    avgRating: averageRating,
-    revenueByMonth,
-    monthlyRevenue: revenueByMonth,
-    recentOrders: rentalOrders.map((order) => ({
-      id: order.id,
-      gearTitle: order.gearTitle,
-      customerName: order.customerName,
-      startDate: order.startDate,
-      endDate: order.endDate,
-      status: order.status,
-    })),
-    orders: [],
-  };
-})();
 
 // =========================
 // Skeleton Components
@@ -273,12 +212,12 @@ export default function ProviderOverviewPage() {
 
         if (!active) return;
 
-        setDashboard(response.data ?? mockDashboard);
+        setDashboard(response.data ?? emptyDashboard);
       } catch {
         if (!active) return;
 
-        setError(null);
-        setDashboard(mockDashboard);
+        setError("دریافت اطلاعات ناموفق بود.");
+        setDashboard(emptyDashboard);
       } finally {
         if (active) {
           setLoading(false);

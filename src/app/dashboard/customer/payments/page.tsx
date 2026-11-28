@@ -21,7 +21,6 @@ import { api } from "@/lib/api";
 
 import { formatJalali, formatNumber, formatToman } from "@/lib/format";
 import { paymentStatusLabel } from "@/lib/labels";
-import { paymentHistory } from "@/lib/content";
 
 // =====================================================
 // TYPES
@@ -195,21 +194,6 @@ function getPaymentGear(payment: Payment) {
   return payment.rentalOrder?.items?.[0]?.gearItem;
 }
 
-function fixtureToPayment(fixture: (typeof paymentHistory)[number]): Payment {
-  return {
-    id: fixture.id,
-    rentalOrderId: fixture.orderId,
-    userId: "",
-    transactionId: fixture.transactionId,
-    amount: fixture.amount,
-    method: fixture.method,
-    status: fixture.status,
-    paidAt: fixture.paidAt,
-    createdAt: fixture.paidAt ?? "",
-    updatedAt: "",
-  };
-}
-
 // =====================================================
 // PAGE
 // =====================================================
@@ -300,24 +284,17 @@ export default function CustomerPaymentsPage() {
           paymentList = [];
         }
 
-        if (paymentList.length === 0) {
-          paymentList = paymentHistory.map(fixtureToPayment);
-        }
-
         setPayments(paymentList);
 
         setTotalPayments(total || paymentList.length);
       } catch {
         if (!mounted) return;
 
-        // Backend unavailable — render the demo fixtures.
-        const fixturePayments = paymentHistory.map(fixtureToPayment);
+        setPayments([]);
 
-        setPayments(fixturePayments);
+        setTotalPayments(0);
 
-        setTotalPayments(fixturePayments.length);
-
-        setError(null);
+        setError("دریافت اطلاعات ناموفق بود.");
       } finally {
         if (mounted) {
           setLoading(false);

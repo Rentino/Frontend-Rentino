@@ -29,7 +29,6 @@ import {
 import { api, ApiRequestError, type ApiResponse } from "@/lib/api";
 import { formatJalali, formatNumber } from "@/lib/format";
 import { roleLabel } from "@/lib/labels";
-import { platformUsers } from "@/lib/content";
 
 import type { User, UserStatus } from "@/types";
 
@@ -91,8 +90,8 @@ export default function AdminUsersPage() {
     } catch (error) {
       console.error("Failed to load users:", error);
 
-      // Mock fallback: the backend is unavailable during local development.
-      setUsers(platformUsers);
+      // Leave the user list empty when the request fails.
+      setUsers([]);
     } finally {
       setLoading(false);
     }

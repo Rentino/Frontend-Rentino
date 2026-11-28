@@ -16,7 +16,6 @@ import {
   formatToman,
 } from "@/lib/format";
 import { paymentStatusLabel, rentalStatusLabel } from "@/lib/labels";
-import { rentalOrders as demoRentalOrders } from "@/lib/content";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -275,45 +274,13 @@ export default function AdminRentalsPage() {
     } catch (err) {
       console.error("Failed to fetch rentals:", err);
 
-      // Mock fallback: the backend is unavailable during local development.
-      setRentalOrders(
-        demoRentalOrders.map((order) => ({
-          id: order.id,
-          customerId: "",
-          status: order.status,
-          startDate: order.startDate,
-          endDate: order.endDate,
-          totalAmount: String(order.totalAmount),
-          notes: null,
-          createdAt: order.startDate,
-          updatedAt: order.startDate,
-          customer: { id: "", name: order.customerName, email: "" },
-          items: [
-            {
-              id: `${order.id}-item`,
-              rentalOrderId: order.id,
-              gearItemId: `${order.id}-gear`,
-              quantity: 1,
-              pricePerDay: "0",
-              subtotal: String(order.totalAmount),
-              gearItem: {
-                id: `${order.id}-gear`,
-                name: order.gearTitle,
-                images: [],
-                pricePerDay: "0",
-                stock: 1,
-                availableStock: 1,
-                isActive: true,
-              },
-            },
-          ],
-          payment: null,
-        })),
-      );
+      // Leave the rental list empty when the request fails.
+      setError("دریافت اطلاعات ناموفق بود.");
+      setRentalOrders([]);
 
       setMeta((current) => ({
         ...current,
-        total: demoRentalOrders.length,
+        total: 0,
         totalPages: 1,
       }));
     } finally {

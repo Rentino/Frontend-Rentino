@@ -30,7 +30,6 @@ import {
 
 import { api, ApiRequestError } from "@/lib/api";
 import { formatJalali, formatNumber } from "@/lib/format";
-import { categories as demoCategories } from "@/lib/content";
 import type { Category } from "@/types";
 
 type CategoryResponse = {
@@ -129,8 +128,8 @@ export default function AdminCategoriesPage() {
     } catch (error) {
       console.error("Failed to fetch categories:", error);
 
-      // Mock fallback: the backend is unavailable during local development.
-      setCategories(demoCategories);
+      // Leave the category list empty when the request fails.
+      setCategories([]);
     } finally {
       setLoading(false);
     }

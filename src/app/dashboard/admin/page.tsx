@@ -17,7 +17,6 @@ import { Badge } from "@/components/ui/badge";
 import { api } from "@/lib/api";
 import { formatNumber, formatToman } from "@/lib/format";
 import { rentalStatusLabel } from "@/lib/labels";
-import { gearItems, platformUsers, rentalOrders } from "@/lib/content";
 import { useEffect, useState } from "react";
 
 // =====================================================
@@ -130,26 +129,8 @@ export default function AdminOverviewPage() {
     } catch (err) {
       console.error("Failed to fetch admin dashboard:", err);
 
-      // Mock fallback: the backend is unavailable during local development.
-      const ordersByStatus: OrderStatus[] = Object.entries(
-        rentalOrders.reduce<Record<string, number>>((acc, order) => {
-          acc[order.status] = (acc[order.status] || 0) + 1;
-          return acc;
-        }, {}),
-      ).map(([status, count]) => ({ status, count }));
-
-      setStats({
-        totalUsers: platformUsers.length,
-        totalCustomers: platformUsers.filter((u) => u.role === "CUSTOMER").length,
-        totalProviders: platformUsers.filter((u) => u.role === "PROVIDER").length,
-        totalGear: gearItems.length,
-        totalOrders: rentalOrders.length,
-        activeOrders: rentalOrders.filter(
-          (o) => o.status !== "CANCELLED" && o.status !== "RETURNED",
-        ).length,
-        totalRevenue: rentalOrders.reduce((sum, o) => sum + o.totalAmount, 0),
-        ordersByStatus,
-      });
+      // Keep zeroed stats when the request fails.
+      setStats(EMPTY_STATS);
     } finally {
       setLoading(false);
     }

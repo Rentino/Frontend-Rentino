@@ -21,7 +21,6 @@ import { api, ApiRequestError } from "@/lib/api";
 import { toast } from "sonner";
 
 import { formatJalali, formatToman } from "@/lib/format";
-import { rentalOrders } from "@/lib/content";
 
 import type { RentalStatus } from "@/types";
 
@@ -168,17 +167,6 @@ function extractPaymentResponse(response: unknown): PaymentResponse {
   return {};
 }
 
-function fixtureToOrder(fixture: (typeof rentalOrders)[number]): CustomerOrder {
-  return {
-    id: fixture.id,
-    startDate: fixture.startDate,
-    endDate: fixture.endDate,
-    totalAmount: fixture.totalAmount,
-    status: fixture.status,
-    gearTitle: fixture.gearTitle,
-  };
-}
-
 function getGearTitle(order: CustomerOrder) {
   if (order.gearTitle) {
     return order.gearTitle;
@@ -252,12 +240,7 @@ export default function PayOrderPage({
 
         const orders = extractOrders(response);
 
-        let foundOrder = orders.find((item) => item.id === id) ?? null;
-
-        if (!foundOrder) {
-          const fixture = rentalOrders.find((item) => item.id === id);
-          foundOrder = fixture ? fixtureToOrder(fixture) : null;
-        }
+        const foundOrder = orders.find((item) => item.id === id) ?? null;
 
         setOrder(foundOrder);
       } catch (error) {
@@ -265,13 +248,7 @@ export default function PayOrderPage({
 
         console.error("LOAD RENTAL ORDER ERROR:", error);
 
-        const fixture = rentalOrders.find((item) => item.id === id);
-
-        if (fixture) {
-          setOrder(fixtureToOrder(fixture));
-        } else {
-          setLoadError(true);
-        }
+        setLoadError(true);
       } finally {
         if (mounted) {
           setLoadingOrder(false);
