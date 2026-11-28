@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { GearImage } from "@/components/gear/gear-image";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,10 +25,9 @@ export function GearCard({ gear }: { gear: GearItem }) {
         href={`/gear/${gear.slug}`}
         className="relative block aspect-[4/3] w-full overflow-hidden bg-surface-muted"
       >
-        <Image
-          src={gear.images[0]}
+        <GearImage
+          src={gear.images?.[0]}
           alt={gear.title}
-          fill
           sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
           className="object-cover transition-transform duration-300 group-hover:scale-105"
         />

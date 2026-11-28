@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+import { GearImage } from "@/components/gear/gear-image";
 import { useEffect, useState } from "react";
 import { Loader2, Star, Package } from "lucide-react";
 import { toast } from "sonner";
@@ -31,7 +31,12 @@ import {
 import { OrderStatusBadge } from "@/components/order-status-badge";
 import { api, ApiRequestError } from "@/lib/api";
 
-import { formatJalali, formatNumber, formatToman, toFaDigits } from "@/lib/format";
+import {
+  formatJalali,
+  formatNumber,
+  formatToman,
+  toFaDigits,
+} from "@/lib/format";
 
 import type { RentalStatus } from "@/types";
 
@@ -286,9 +291,7 @@ export default function CustomerOrdersPage() {
       toast.success("نظر شما ثبت شد.");
     } catch (error) {
       toast.error(
-        error instanceof ApiRequestError
-          ? error.message
-          : "ثبت نظر ممکن نشد.",
+        error instanceof ApiRequestError ? error.message : "ثبت نظر ممکن نشد.",
       );
     } finally {
       setSubmittingReview(false);
@@ -362,10 +365,9 @@ export default function CustomerOrdersPage() {
                           <div className="relative h-12 w-16 shrink-0 overflow-hidden rounded-md bg-surface-muted">
                             {order.items[0] &&
                             getGearImage(order.items[0].gearItem) ? (
-                              <Image
+                              <GearImage
                                 src={getGearImage(order.items[0].gearItem)!}
                                 alt={getGearName(order.items[0].gearItem)}
-                                fill
                                 sizes="64px"
                                 className="object-cover"
                               />

@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useEffect, useRef, useState } from "react";
+import { Controller, useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { Plus, Trash2 } from "lucide-react";
+import { ImagePlus, Loader2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,14 @@ import {
 
 import { gearFormSchema, type GearFormInput } from "@/lib/validations";
 import { api, ApiRequestError } from "@/lib/api";
+import {
+  ALLOWED_SPEC_KEYS,
+  ALL_SPEC_KEYS,
+  MAX_GEAR_IMAGES,
+  MAX_GEAR_SPECS,
+  MAX_SPEC_VALUE_LENGTH,
+} from "@/lib/catalog-limits";
+import { formatNumber, parseDigits } from "@/lib/format";
 
 import type { GearItem, Category } from "@/types";
 
@@ -112,6 +120,17 @@ export function GearForm({ initialGear }: GearFormProps) {
   const [categoryLoading, setCategoryLoading] = useState(true);
   const [categoryError, setCategoryError] = useState<string | null>(null);
 
+  // Display value for the price field — digits are grouped in threes while the
+  // form value stays a plain integer number of Rials for the API.
+  const [priceDisplay, setPriceDisplay] = useState(() =>
+    initialGear ? formatNumber(initialGear.pricePerDay) : "",
+  );
+  const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
+  const [serverErrors, setServerErrors] = useState<Record<string, string[]>>(
+    {},
+  );
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const {
     register,
     control,
@@ -172,7 +191,18 @@ export function GearForm({ initialGear }: GearFormProps) {
   });
 
   const images = watch("images") ?? [];
+  const specValues = watch("specs") ?? [];
   const selectedCategory = watch("categoryId");
+
+  // Specification keys depend on the selected category so providers can only
+  // choose meaningful attributes for what they are listing (#50).
+  const specKeyOptions = selectedCategory
+    ? (() => {
+        const category = categories.find((c) => c.id === selectedCategory);
+        const bySlug = category ? ALLOWED_SPEC_KEYS[category.slug] : undefined;
+        return bySlug && bySlug.length > 0 ? bySlug : ALL_SPEC_KEYS;
+      })()
+    : ALL_SPEC_KEYS;
 
   // ---------------------------------------------
   // Load categories
@@ -260,6 +290,9 @@ export function GearForm({ initialGear }: GearFormProps) {
       router.push("/dashboard/provider/gear");
       router.refresh();
     } catch (error) {
+      setServerErrors(
+        error instanceof ApiRequestError ? (error.errors ?? {}) : {},
+      );
       toast.error(
         error instanceof ApiRequestError
           ? error.message
@@ -286,9 +319,47 @@ export function GearForm({ initialGear }: GearFormProps) {
   }
 
   function addImage() {
+    if (images.length >= MAX_GEAR_IMAGES) return;
     setValue("images", [...images, ""], {
       shouldDirty: true,
+      shouldValidate: true,
     });
+  }
+
+  async function uploadImage(index: number, file: File) {
+    if (!file.type.startsWith("image/")) {
+      toast.error("فقط فایل تصویر می‌توانید آپلود کنید");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("حجم تصویر باید کمتر از ۲ مگابایت باشد");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    setUploadingIndex(index);
+    try {
+      // The API client always sets JSON headers, so uploads use fetch directly.
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1"}/uploads/images`,
+        { method: "POST", body: formData, credentials: "include" },
+      );
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(payload?.message ?? "آپلود تصویر ممکن نشد");
+      }
+      updateImage(index, payload.data.url as string);
+      toast.success("تصویر آپلود شد");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "آپلود تصویر ممکن نشد",
+      );
+    } finally {
+      setUploadingIndex(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
   }
 
   function removeImage(index: number) {
@@ -340,7 +411,11 @@ export function GearForm({ initialGear }: GearFormProps) {
             <div className="space-y-1.5">
               <Label htmlFor="brand">برند</Label>
 
-              <Input id="brand" placeholder="مثلاً: Sony" {...register("brand")} />
+              <Input
+                id="brand"
+                placeholder="مثلاً: Sony"
+                {...register("brand")}
+              />
 
               {errors.brand && (
                 <p className="text-xs text-danger">{errors.brand.message}</p>
@@ -409,16 +484,38 @@ export function GearForm({ initialGear }: GearFormProps) {
             <div className="space-y-1.5">
               <Label htmlFor="pricePerDay">قیمت هر روز (ریال)</Label>
 
-              <Input
-                id="pricePerDay"
-                type="number"
-                step="1"
-                min="0"
-                {...register("pricePerDay", {
-                  valueAsNumber: true,
-                })}
+              <Controller
+                name="pricePerDay"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="pricePerDay"
+                    type="text"
+                    inputMode="numeric"
+                    dir="ltr"
+                    className="text-end"
+                    placeholder="مثلاً: ۴٬۰۰۰٬۰۰۰"
+                    value={priceDisplay}
+                    onChange={(event) => {
+                      const digits = parseDigits(event.target.value).slice(
+                        0,
+                        12,
+                      );
+                      setPriceDisplay(
+                        digits ? formatNumber(Number(digits)) : "",
+                      );
+                      field.onChange(digits ? Number(digits) : NaN);
+                    }}
+                    onBlur={() => {
+                      field.onBlur();
+                      const digits = parseDigits(priceDisplay);
+                      setPriceDisplay(
+                        digits ? formatNumber(Number(digits)) : "",
+                      );
+                    }}
+                  />
+                )}
               />
-
               {errors.pricePerDay && (
                 <p className="text-xs text-danger">
                   {errors.pricePerDay.message}
@@ -452,45 +549,92 @@ export function GearForm({ initialGear }: GearFormProps) {
       <Card>
         <CardContent className="space-y-3 p-5">
           <div className="flex items-center justify-between">
-            <Label>آدرس تصاویر</Label>
+            <div>
+              <Label>آدرس تصاویر</Label>
+              <p className="mt-0.5 text-xs text-muted">
+                {images.length} از {MAX_GEAR_IMAGES} تصویر — لینک http(s) یا
+                مسیر محلی /images/... مجاز است.
+              </p>
+            </div>
 
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={addImage}
-            >
-              <Plus className="h-3.5 w-3.5" />
-              افزودن تصویر
-            </Button>
+            <div className="flex gap-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  if (!file) return;
+                  const target = Math.min(images.length - 1, 0);
+                  void uploadImage(target, file);
+                }}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingIndex !== null}
+              >
+                {uploadingIndex !== null ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <ImagePlus className="h-3.5 w-3.5" />
+                )}
+                آپلود تصویر
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addImage}
+                disabled={images.length >= MAX_GEAR_IMAGES}
+              >
+                <Plus className="h-3.5 w-3.5" />
+                افزودن لینک
+              </Button>
+            </div>
           </div>
 
           {images.map((image, index) => (
-            <div key={index} className="flex gap-2">
-              <Input
-                placeholder="https://example.com/image.jpg"
-                dir="ltr"
-                value={image}
-                onChange={(event) => updateImage(index, event.target.value)}
-              />
-
-              {images.length > 1 && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeImage(index)}
-                >
-                  <Trash2 className="h-4 w-4 text-danger" />
-                </Button>
+            <div key={index} className="space-y-1">
+              <div className="flex gap-2">
+                <Input
+                  placeholder="https://example.com/image.jpg یا /images/gear/…"
+                  dir="ltr"
+                  value={image}
+                  onChange={(event) => updateImage(index, event.target.value)}
+                  aria-invalid={
+                    !!errors.images?.[index] || !!serverErrors.images?.[index]
+                  }
+                />
+                {images.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeImage(index)}
+                  >
+                    <Trash2 className="h-4 w-4 text-danger" />
+                  </Button>
+                )}
+              </div>
+              {errors.images?.[index] && (
+                <p className="text-xs text-danger">
+                  {errors.images[index]?.message}
+                </p>
+              )}
+              {serverErrors.images?.[index] && (
+                <p className="text-xs text-danger">
+                  {serverErrors.images[index]}
+                </p>
               )}
             </div>
           ))}
 
-          {errors.images && (
-            <p className="text-xs text-danger">
-              {String(errors.images.message)}
-            </p>
+          {typeof errors.images?.message === "string" && (
+            <p className="text-xs text-danger">{errors.images.message}</p>
           )}
         </CardContent>
       </Card>
@@ -500,12 +644,19 @@ export function GearForm({ initialGear }: GearFormProps) {
       <Card>
         <CardContent className="space-y-3 p-5">
           <div className="flex items-center justify-between">
-            <Label>مشخصات</Label>
+            <div>
+              <Label>مشخصات</Label>
+              <p className="mt-0.5 text-xs text-muted">
+                {specFields.length} از {MAX_GEAR_SPECS} مشخصه — فقط مشخصات مجاز
+                مربوط به دسته انتخابی پذیرفته میشود.
+              </p>
+            </div>
 
             <Button
               type="button"
               variant="outline"
               size="sm"
+              disabled={specFields.length >= MAX_GEAR_SPECS}
               onClick={() =>
                 appendSpec({
                   key: "",
@@ -519,29 +670,61 @@ export function GearForm({ initialGear }: GearFormProps) {
           </div>
 
           {specFields.map((field, index) => (
-            <div key={field.id} className="flex gap-2">
-              <Input
-                placeholder="نام مشخصه (مثلاً گیربکس)"
-                {...register(`specs.${index}.key`)}
-              />
-
-              <Input
-                placeholder="مقدار (مثلاً دنده‌ای)"
-                {...register(`specs.${index}.value`)}
-              />
-
-              {specFields.length > 1 && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeSpec(index)}
+            <div key={field.id} className="space-y-1">
+              <div className="flex flex-wrap gap-2">
+                <Select
+                  value={specValues[index]?.key || ""}
+                  onValueChange={(value) =>
+                    setValue(`specs.${index}.key`, value, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
+                  }
                 >
-                  <Trash2 className="h-4 w-4 text-danger" />
-                </Button>
+                  <SelectTrigger className="w-full sm:w-48">
+                    <SelectValue placeholder="انتخاب مشخصه" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {specKeyOptions.map((key) => (
+                      <SelectItem key={key} value={key}>
+                        {key}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Input
+                  className="flex-1"
+                  placeholder="مقدار (مثلاً دندهای)"
+                  maxLength={MAX_SPEC_VALUE_LENGTH}
+                  {...register(`specs.${index}.value`)}
+                />
+
+                {specFields.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeSpec(index)}
+                  >
+                    <Trash2 className="h-4 w-4 text-danger" />
+                  </Button>
+                )}
+              </div>
+              {errors.specs?.[index]?.key && (
+                <p className="text-xs text-danger">
+                  {errors.specs[index]?.key?.message}
+                </p>
+              )}
+              {errors.specs?.[index]?.value && (
+                <p className="text-xs text-danger">
+                  {errors.specs[index]?.value?.message}
+                </p>
               )}
             </div>
           ))}
+          {typeof errors.specs?.message === "string" && (
+            <p className="text-xs text-danger">{errors.specs.message}</p>
+          )}
         </CardContent>
       </Card>
 

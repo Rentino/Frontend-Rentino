@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { GearImage } from "@/components/gear/gear-image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Navbar } from "@/components/navbar";
@@ -124,10 +124,9 @@ export default async function GearDetailsPage({
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg border border-border bg-surface-muted">
-              <Image
-                src={gear.images[0]}
+              <GearImage
+                src={gear.images?.[0]}
                 alt={gear.title}
-                fill
                 className="object-cover"
                 priority
               />
@@ -173,7 +172,9 @@ export default async function GearDetailsPage({
             <Separator className="my-6" />
 
             <section>
-              <h2 className="font-display text-lg font-semibold">تأمین‌کننده</h2>
+              <h2 className="font-display text-lg font-semibold">
+                تأمین‌کننده
+              </h2>
               <div className="mt-3 flex items-center gap-3 rounded-md border border-border p-3">
                 <Avatar>
                   <AvatarFallback>
@@ -194,7 +195,8 @@ export default async function GearDetailsPage({
             <section>
               <h2 className="font-display text-lg font-semibold">
                 نظرات{" "}
-                {gearReviews.length > 0 && `(${formatNumber(gearReviews.length)})`}
+                {gearReviews.length > 0 &&
+                  `(${formatNumber(gearReviews.length)})`}
               </h2>
               {gearReviews.length === 0 ? (
                 <p className="mt-2 text-sm text-muted">
@@ -209,7 +211,9 @@ export default async function GearDetailsPage({
                       className="rounded-md border border-border p-4"
                     >
                       <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium">{r.customer?.name}</p>
+                        <p className="text-sm font-medium">
+                          {r.customer?.name}
+                        </p>
                         <StarRating rating={r.rating} />
                       </div>
                       <p className="mt-2 text-sm text-muted">{r.comment}</p>

@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { GearImage } from "@/components/gear/gear-image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Package, Wallet, Star, Clock } from "lucide-react";
@@ -545,10 +545,9 @@ export default function CustomerOverviewPage() {
                           <div className="flex items-center gap-3">
                             <div className="relative h-11 w-14 shrink-0 overflow-hidden rounded-md bg-surface-muted">
                               {order.image ? (
-                                <Image
+                                <GearImage
                                   src={order.image}
                                   alt={order.gearTitle}
-                                  fill
                                   sizes="56px"
                                   className="object-cover"
                                 />
@@ -581,9 +580,7 @@ export default function CustomerOverviewPage() {
 
                         {/* Total */}
 
-                        <TableCell>
-                          {formatToman(order.totalAmount)}
-                        </TableCell>
+                        <TableCell>{formatToman(order.totalAmount)}</TableCell>
 
                         {/* Status */}
 
@@ -702,9 +699,7 @@ export default function CustomerOverviewPage() {
                         </TableCell>
 
                         <TableCell className="text-muted">
-                          {payment.paidAt
-                            ? formatJalali(payment.paidAt)
-                            : "—"}
+                          {payment.paidAt ? formatJalali(payment.paidAt) : "—"}
                         </TableCell>
                       </TableRow>
                     ))}

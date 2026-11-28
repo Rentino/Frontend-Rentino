@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
+import { GearImage } from "@/components/gear/gear-image";
 import { CreditCard, Package } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -458,10 +458,9 @@ export default function CustomerPaymentsPage() {
                           <div className="flex items-center gap-3">
                             <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-md border bg-muted">
                               {image ? (
-                                <Image
+                                <GearImage
                                   src={image}
                                   alt={gear?.name ?? "کالا"}
-                                  fill
                                   sizes="44px"
                                   className="object-cover"
                                 />
@@ -499,9 +498,7 @@ export default function CustomerPaymentsPage() {
 
                         {/* METHOD */}
 
-                        <TableCell>
-                          {formatMethod(payment.method)}
-                        </TableCell>
+                        <TableCell>{formatMethod(payment.method)}</TableCell>
 
                         {/* AMOUNT */}
 
@@ -520,7 +517,7 @@ export default function CustomerPaymentsPage() {
                         {/* DATE */}
 
                         <TableCell className="whitespace-nowrap text-sm text-muted">
-                          {payment.paidAt ?? payment.createdAt
+                          {(payment.paidAt ?? payment.createdAt)
                             ? formatJalali(payment.paidAt ?? payment.createdAt)
                             : "—"}
                         </TableCell>

@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { GearImage } from "@/components/gear/gear-image";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -287,8 +287,8 @@ export default async function HomePage() {
             </h1>
 
             <p className="mt-5 max-w-md text-base text-muted sm:text-lg">
-              خودرو، کنسول بازی، دوربین، دوچرخه و لپ‌تاپ از تأمین‌کنندگان
-              معتبر — با قیمت روزانه شفاف و تحویل سریع.
+              خودرو، کنسول بازی، دوربین، دوچرخه و لپ‌تاپ از تأمین‌کنندگان معتبر
+              — با قیمت روزانه شفاف و تحویل سریع.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -331,10 +331,9 @@ export default async function HomePage() {
                       index % 2 === 1 ? "translate-y-3" : ""
                     }`}
                   >
-                    <Image
+                    <GearImage
                       src={image}
                       alt={item.title}
-                      fill
                       sizes="(min-width: 1024px) 16vw, 33vw"
                       className="object-cover opacity-90 transition-opacity group-hover:opacity-100"
                     />

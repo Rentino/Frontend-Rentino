@@ -1,4 +1,12 @@
 import { z } from "zod";
+import {
+  ALL_SPEC_KEYS,
+  isValidImageUrl,
+  MAX_GEAR_IMAGES,
+  MAX_GEAR_SPECS,
+  MAX_SPEC_KEY_LENGTH,
+  MAX_SPEC_VALUE_LENGTH,
+} from "@/lib/catalog-limits";
 
 export const registerSchema = z
   .object({
@@ -36,14 +44,45 @@ export const gearFormSchema = z.object({
   pricePerDay: z.coerce.number().positive("قیمت باید بیشتر از صفر باشد"),
   stock: z.coerce.number().int().min(0, "موجودی نمی‌تواند منفی باشد"),
   images: z
-    .array(z.string().url("هر تصویر باید یک آدرس معتبر باشد"))
-    .min(1, "حداقل یک آدرس تصویر وارد کنید"),
-  specs: z.array(
-    z.object({
-      key: z.string().min(1, "نام مشخصه را وارد کنید"),
-      value: z.string().min(1, "مقدار مشخصه را وارد کنید"),
-    }),
-  ),
+    .array(
+      z
+        .string()
+        .trim()
+        .min(1, "آدرس تصویر را وارد کنید")
+        .max(500, "آدرس تصویر بیش از حد طولانی است")
+        .refine(
+          isValidImageUrl,
+          "آدرس تصویر معتبر نیست؛ از لینک http(s) یا مسیر /images/... استفاده کنید",
+        ),
+    )
+    .min(1, "حداقل یک آدرس تصویر وارد کنید")
+    .max(MAX_GEAR_IMAGES, `حداکثر ${MAX_GEAR_IMAGES} تصویر می‌توانید ثبت کنید`),
+  specs: z
+    .array(
+      z.object({
+        key: z
+          .string()
+          .trim()
+          .min(1, "نام مشخصه را وارد کنید")
+          .max(
+            MAX_SPEC_KEY_LENGTH,
+            `نام مشخصه باید کمتر از ${MAX_SPEC_KEY_LENGTH} کاراکتر باشد`,
+          )
+          .refine(
+            (value) => value === "" || ALL_SPEC_KEYS.includes(value),
+            "این مشخصه مجاز نیست؛ لطفاً از فهرست مشخصات مجاز انتخاب کنید",
+          ),
+        value: z
+          .string()
+          .trim()
+          .min(1, "مقدار مشخصه را وارد کنید")
+          .max(
+            MAX_SPEC_VALUE_LENGTH,
+            `مقدار مشخصه باید کمتر از ${MAX_SPEC_VALUE_LENGTH} کاراکتر باشد`,
+          ),
+      }),
+    )
+    .max(MAX_GEAR_SPECS, `حداکثر ${MAX_GEAR_SPECS} مشخصه می‌توانید ثبت کنید`),
 });
 
 export type GearFormInput = z.infer<typeof gearFormSchema>;

@@ -13,6 +13,8 @@ export interface ApiGear {
   stock: number;
   availableStock: number;
   specifications: Record<string, string> | null;
+  availability?: "AVAILABLE" | "UNAVAILABLE" | "MAINTENANCE";
+  unavailableReason?: string | null;
   isActive: boolean;
   createdAt: string;
   provider?: { id: string; name: string };
@@ -22,7 +24,16 @@ export interface ApiGear {
 }
 
 export function toGearItem(gear: ApiGear): GearItem {
-  const availability: GearAvailability = gear.availableStock > 0 ? "AVAILABLE" : "RENTED";
+  // Provider-controlled state wins. `MAINTENANCE` is kept bookable as before
+  // for backward compatibility with the demo data; `UNAVAILABLE` blocks it.
+  const availability: GearAvailability =
+    gear.availability === "UNAVAILABLE"
+      ? "MAINTENANCE"
+      : gear.availability === "MAINTENANCE"
+        ? "MAINTENANCE"
+        : gear.availableStock > 0
+          ? "AVAILABLE"
+          : "RENTED";
   return {
     id: gear.id,
     title: gear.name,

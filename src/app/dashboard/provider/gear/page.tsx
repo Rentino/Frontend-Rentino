@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import { GearImage } from "@/components/gear/gear-image";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/dialog";
 
 import { Skeleton } from "@/components/ui/skeleton";
+import { Checkbox } from "@/components/ui/checkbox";
 
 import { api, ApiRequestError } from "@/lib/api";
 import { formatNumber, formatToman } from "@/lib/format";
@@ -121,6 +122,9 @@ function InventorySkeleton() {
 export default function ProviderInventoryPage() {
   const [items, setItems] = useState<GearItem[]>([]);
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
+  const [pendingAvailability, setPendingAvailability] = useState<string | null>(
+    null,
+  );
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -163,6 +167,36 @@ export default function ProviderInventoryPage() {
       mounted = false;
     };
   }, []);
+
+  async function toggleAvailability(id: string, available: boolean) {
+    setPendingAvailability(id);
+    const previous = items;
+    setItems((prev) =>
+      prev.map((gear) =>
+        gear.id === id
+          ? {
+              ...gear,
+              availability: available ? "AVAILABLE" : "MAINTENANCE",
+            }
+          : gear,
+      ),
+    );
+    try {
+      await api.put(`/provider/gear/${id}`, {
+        availability: available ? "AVAILABLE" : "UNAVAILABLE",
+      });
+      toast.success(available ? "کالا دوباره موجود شد" : "کالا ناموجود شد");
+    } catch (error) {
+      setItems(previous);
+      toast.error(
+        error instanceof ApiRequestError
+          ? error.message
+          : "تغییر وضعیت موجودی ممکن نشد.",
+      );
+    } finally {
+      setPendingAvailability(null);
+    }
+  }
 
   async function confirmDelete() {
     if (!pendingDelete) return;
@@ -246,19 +280,12 @@ export default function ProviderInventoryPage() {
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <div className="relative h-10 w-14 shrink-0 overflow-hidden rounded bg-surface-muted">
-                          {gear.images?.[0] ? (
-                            <Image
-                              src={gear.images[0]}
-                              alt={gear.title}
-                              fill
-                              sizes="56px"
-                              className="object-cover"
-                            />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center text-xs text-muted">
-                              بدون تصویر
-                            </div>
-                          )}
+                          <GearImage
+                            src={gear.images?.[0]}
+                            alt={gear.title}
+                            sizes="56px"
+                            className="object-cover"
+                          />
                         </div>
 
                         <div>
@@ -279,11 +306,22 @@ export default function ProviderInventoryPage() {
                     {/* Stock */}
                     <TableCell>{formatNumber(gear.stock)}</TableCell>
 
-                    {/* Availability */}
+                    {/* Availability (#54) */}
                     <TableCell>
-                      <Badge variant={availabilityVariant[gear.availability]}>
-                        {availabilityLabel[gear.availability]}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <Checkbox
+                          id={`available-${gear.id}`}
+                          checked={gear.availability === "AVAILABLE"}
+                          disabled={pendingAvailability === gear.id}
+                          onCheckedChange={(checked) =>
+                            void toggleAvailability(gear.id, checked === true)
+                          }
+                          aria-label="موجود بودن کالا"
+                        />
+                        <Badge variant={availabilityVariant[gear.availability]}>
+                          {availabilityLabel[gear.availability]}
+                        </Badge>
+                      </div>
                     </TableCell>
 
                     {/* Actions */}
@@ -312,7 +350,9 @@ export default function ProviderInventoryPage() {
                 {items.length === 0 && !error && (
                   <TableRow>
                     <TableCell colSpan={5} className="py-12 text-center">
-                      <p className="text-sm text-muted">هنوز کالایی ثبت نشده است.</p>
+                      <p className="text-sm text-muted">
+                        هنوز کالایی ثبت نشده است.
+                      </p>
 
                       <Button
                         asChild
@@ -347,7 +387,8 @@ export default function ProviderInventoryPage() {
             <DialogTitle>این کالا حذف شود؟</DialogTitle>
 
             <DialogDescription>
-              با این کار آگهی فوراً برداشته می‌شود. اجاره‌های تأییدشده فعلی تحت تأثیر قرار نمی‌گیرند.
+              با این کار آگهی فوراً برداشته می‌شود. اجاره‌های تأییدشده فعلی تحت
+              تأثیر قرار نمی‌گیرند.
             </DialogDescription>
           </DialogHeader>
 

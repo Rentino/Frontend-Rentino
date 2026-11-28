@@ -20,13 +20,6 @@ function dayOffset(n: number): string {
 
 export const categories: Category[] = [
   {
-    id: "cat-cars",
-    name: "خودرو",
-    slug: "cars",
-    icon: "cars",
-    description: "خودروهای سواری برای سفر، کار و استفاده روزانه",
-  },
-  {
     id: "cat-consoles",
     name: "کنسول بازی",
     slug: "consoles",
@@ -64,66 +57,6 @@ const provider = (id: string, name: string) => ({ id, name });
 
 export const gearItems: GearItem[] = [
   // ---- Cars
-  {
-    id: "gear-pride-131",
-    title: "پراید ۱۳۱ مدل ۱۴۰۰",
-    slug: "pride-131-1400",
-    brand: "سایپا",
-    categoryId: "cat-cars",
-    category: categories[0],
-    providerId: "prov-1",
-    provider: provider("prov-1", "علی رضایی"),
-    description:
-      "پراید ۱۳۱ کم‌کارکرد و تمیز، مناسب سفرهای شهری و بین‌شهری. بیمه شخص ثالث و بدنه معتبر، تحویل با باک پر.",
-    images: ["/images/cars.svg"],
-    pricePerDay: 8_000_000,
-    specs: { گیربکس: "دنده‌ای", "سال تولید": "۱۴۰۰", سوخت: "بنزین" },
-    availability: "AVAILABLE",
-    stock: 1,
-    rating: 4.4,
-    reviewCount: 38,
-    createdAt: dayOffset(-90),
-  },
-  {
-    id: "gear-206",
-    title: "پژو ۲۰۶ تیپ ۲",
-    slug: "peugeot-206-tip2",
-    brand: "ایران‌خودرو",
-    categoryId: "cat-cars",
-    category: categories[0],
-    providerId: "prov-1",
-    provider: provider("prov-1", "علی رضایی"),
-    description:
-      "پژو ۲۰۶ تیپ ۲ با کولر سالم و لاستیک‌های نو. مناسب اجاره روزانه و هفتگی با تحویل در محل.",
-    images: ["/images/cars.svg"],
-    pricePerDay: 12_000_000,
-    specs: { گیربکس: "دنده‌ای", "سال تولید": "۱۳۹۸", سوخت: "بنزین" },
-    availability: "AVAILABLE",
-    stock: 2,
-    rating: 4.6,
-    reviewCount: 52,
-    createdAt: dayOffset(-75),
-  },
-  {
-    id: "gear-samand",
-    title: "سمند LX",
-    slug: "samand-lx",
-    brand: "ایران‌خودرو",
-    categoryId: "cat-cars",
-    category: categories[0],
-    providerId: "prov-2",
-    provider: provider("prov-2", "مریم احمدی"),
-    description:
-      "سمند LX جادار و مطمئن با دو کیسه هوا. گزینه‌ای اقتصادی برای سفرهای خانوادگی.",
-    images: ["/images/cars.svg"],
-    pricePerDay: 10_000_000,
-    specs: { گیربکس: "دنده‌ای", "سال تولید": "۱۳۹۹", سوخت: "گازسوز" },
-    availability: "RENTED",
-    stock: 1,
-    rating: 4.3,
-    reviewCount: 27,
-    createdAt: dayOffset(-60),
-  },
   // ---- Consoles
   {
     id: "gear-ps5",
@@ -131,7 +64,7 @@ export const gearItems: GearItem[] = [
     slug: "playstation-5-disc",
     brand: "Sony",
     categoryId: "cat-consoles",
-    category: categories[1],
+    category: categories[0],
     providerId: "prov-3",
     provider: provider("prov-3", "رضا کاظمی"),
     description:
@@ -151,7 +84,7 @@ export const gearItems: GearItem[] = [
     slug: "xbox-series-s",
     brand: "Microsoft",
     categoryId: "cat-consoles",
-    category: categories[1],
+    category: categories[0],
     providerId: "prov-3",
     provider: provider("prov-3", "رضا کاظمی"),
     description:
@@ -172,7 +105,7 @@ export const gearItems: GearItem[] = [
     slug: "mountain-bike-29",
     brand: "شیمانو",
     categoryId: "cat-bikes",
-    category: categories[2],
+    category: categories[1],
     providerId: "prov-4",
     provider: provider("prov-4", "سارا موسوی"),
     description:
@@ -192,7 +125,7 @@ export const gearItems: GearItem[] = [
     slug: "city-bike",
     brand: "ترک",
     categoryId: "cat-bikes",
-    category: categories[2],
+    category: categories[1],
     providerId: "prov-4",
     provider: provider("prov-4", "سارا موسوی"),
     description:
@@ -213,7 +146,7 @@ export const gearItems: GearItem[] = [
     slug: "canon-eos-r6",
     brand: "Canon",
     categoryId: "cat-cameras",
-    category: categories[3],
+    category: categories[2],
     providerId: "prov-5",
     provider: provider("prov-5", "حسین نادری"),
     description:
@@ -233,7 +166,7 @@ export const gearItems: GearItem[] = [
     slug: "sony-a7-iii",
     brand: "Sony",
     categoryId: "cat-cameras",
-    category: categories[3],
+    category: categories[2],
     providerId: "prov-5",
     provider: provider("prov-5", "حسین نادری"),
     description:
@@ -253,7 +186,7 @@ export const gearItems: GearItem[] = [
     slug: "gopro-hero-11",
     brand: "GoPro",
     categoryId: "cat-cameras",
-    category: categories[3],
+    category: categories[2],
     providerId: "prov-5",
     provider: provider("prov-5", "حسین نادری"),
     description:
@@ -274,7 +207,7 @@ export const gearItems: GearItem[] = [
     slug: "macbook-air-m2",
     brand: "Apple",
     categoryId: "cat-laptops",
-    category: categories[4],
+    category: categories[3],
     providerId: "prov-6",
     provider: provider("prov-6", "نگار صادقی"),
     description:
@@ -294,7 +227,7 @@ export const gearItems: GearItem[] = [
     slug: "asus-tuf-gaming",
     brand: "Asus",
     categoryId: "cat-laptops",
-    category: categories[4],
+    category: categories[3],
     providerId: "prov-6",
     provider: provider("prov-6", "نگار صادقی"),
     description:
@@ -352,7 +285,8 @@ export const testimonials: { name: string; role: string; quote: string }[] = [
   {
     name: "امیر کریمی",
     role: "عکاس عروسی",
-    quote: "برای پروژه‌های عکاسی همیشه از رنتینو دوربین می‌گیرم؛ قیمت شفاف و تحویل سر وقت.",
+    quote:
+      "برای پروژه‌های عکاسی همیشه از رنتینو دوربین می‌گیرم؛ قیمت شفاف و تحویل سر وقت.",
   },
   {
     name: "نگار محمدی",
@@ -391,8 +325,7 @@ export const blogPosts: {
   {
     slug: "best-consoles-for-party",
     title: "بهترین کنسول‌های بازی برای دورهمی",
-    excerpt:
-      "پلی‌استیشن یا ایکس‌باکس؟ راهنمای انتخاب کنسول مناسب مهمانی شما.",
+    excerpt: "پلی‌استیشن یا ایکس‌باکس؟ راهنمای انتخاب کنسول مناسب مهمانی شما.",
     category: "سرگرمی",
     date: dayOffset(-9),
     content:
@@ -501,7 +434,6 @@ export const paymentHistory: {
 // -----------------------------------------------------
 
 export const bookingsByCategory: { name: string; value: number }[] = [
-  { name: "خودرو", value: 420 },
   { name: "کنسول بازی", value: 310 },
   { name: "دوربین", value: 265 },
   { name: "دوچرخه", value: 180 },
