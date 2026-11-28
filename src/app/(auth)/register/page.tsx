@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Aperture, User, Store } from "lucide-react";
+import { User, Store } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { registerSchema, type RegisterInput } from "@/lib/validations";
 import { useAuth } from "@/lib/auth-context";
 import { ApiRequestError } from "@/lib/api";
+import { BrandMark } from "@/components/brand-mark";
 
 export default function RegisterPage() {
   const { register: registerUser } = useAuth();
@@ -52,7 +53,7 @@ export default function RegisterPage() {
     <div className="flex min-h-screen items-center justify-center bg-surface px-4 py-12">
       <div className="w-full max-w-sm">
         <Link href="/" className="mb-8 flex items-center justify-center gap-2 font-display text-lg font-semibold">
-          <Aperture className="h-6 w-6 text-primary" strokeWidth={1.75} />
+          <BrandMark className="h-6 w-6 text-primary" />
           رنتینو
         </Link>
 

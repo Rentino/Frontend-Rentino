@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  Aperture,
   Menu,
   X,
   LayoutDashboard,
@@ -26,6 +25,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { BrandMark } from "@/components/brand-mark";
 
 const loggedOutLinks = [
   { href: "/", label: "خانه" },
@@ -63,7 +63,7 @@ export function Navbar() {
           href="/"
           className="flex items-center gap-2 font-display text-lg font-semibold"
         >
-          <Aperture className="h-6 w-6 text-primary" strokeWidth={1.75} />
+          <BrandMark className="h-6 w-6 text-primary" />
           رنتینو
         </Link>
 

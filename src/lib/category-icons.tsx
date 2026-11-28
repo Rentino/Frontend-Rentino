@@ -1,10 +1,5 @@
 import {
   Camera,
-  Aperture,
-  Lightbulb,
-  Mic,
-  Plane,
-  Speaker,
   Car,
   Gamepad2,
   Bike,
@@ -31,11 +26,4 @@ export const categoryIconMap: Record<string, LucideIcon> = {
   laptop: Laptop,
   sports: Trophy,
   sport: Trophy,
-
-  // Legacy photo-gear keys (kept for backward compatibility)
-  aperture: Aperture,
-  lightbulb: Lightbulb,
-  mic: Mic,
-  plane: Plane,
-  speaker: Speaker,
 };

@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Aperture, Mail, MapPin, Send } from "lucide-react";
+import { Mail, MapPin, Send } from "lucide-react";
+import { BrandMark } from "@/components/brand-mark";
 
 const columns = [
   {
@@ -40,7 +41,7 @@ export function Footer() {
               href="/"
               className="flex items-center gap-2 font-display text-lg font-semibold"
             >
-              <Aperture className="h-6 w-6 text-primary" strokeWidth={1.75} />
+              <BrandMark className="h-6 w-6 text-primary" />
               رنتینو
             </Link>
 

@@ -1,5 +1,5 @@
-import { Aperture } from "lucide-react";
 
+import { BrandMark } from "@/components/brand-mark";
 export default function GlobalLoading() {
   return (
     <div
@@ -14,7 +14,7 @@ export default function GlobalLoading() {
 
         {/* Inner brand circle */}
         <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm">
-          <Aperture className="h-5 w-5 animate-pulse" />
+          <BrandMark className="h-5 w-5 animate-pulse" />
         </span>
       </div>
 

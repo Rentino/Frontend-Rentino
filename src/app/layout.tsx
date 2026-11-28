@@ -17,6 +17,11 @@ export const metadata: Metadata = {
   title: "رنتینو — بازارچه آنلاین اجاره کالا",
   description:
     "رنتینو؛ بازارچه آنلاین اجاره خودرو، کنسول بازی، دوچرخه، دوربین و دیگر کالاها. رزرو آسان، قیمت شفاف و تحویل سریع از تأمین‌کنندگان معتبر.",
+  applicationName: "رنتینو",
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/icon.svg", type: "image/svg+xml" }],
+  },
 };
 
 export default function RootLayout({

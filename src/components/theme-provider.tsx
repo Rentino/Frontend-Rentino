@@ -9,7 +9,7 @@ const ThemeContext = createContext<{ theme: Theme; setTheme: (theme: Theme) => v
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(() => {
     if (typeof window === "undefined") return "dark";
-    const savedTheme = window.localStorage.getItem("lensloop_theme");
+    const savedTheme = window.localStorage.getItem("rentino_theme");
     return savedTheme === "light" || savedTheme === "dark" ? savedTheme : "dark";
   });
 
@@ -19,7 +19,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme]);
 
   function setTheme(nextTheme: Theme) {
-    window.localStorage.setItem("lensloop_theme", nextTheme);
+    window.localStorage.setItem("rentino_theme", nextTheme);
     setThemeState(nextTheme);
   }
 

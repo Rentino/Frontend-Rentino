@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Aperture } from "lucide-react";
 import { toast } from "sonner";
 import { GoogleLogin } from "@react-oauth/google";
 
@@ -18,6 +17,7 @@ import { loginSchema, type LoginInput } from "@/lib/validations";
 import { useAuth } from "@/lib/auth-context";
 import { ApiRequestError } from "@/lib/api";
 import type { Role } from "@/types";
+import { BrandMark } from "@/components/brand-mark";
 
 export default function LoginPage() {
   return (
@@ -131,7 +131,7 @@ function LoginForm() {
           href="/"
           className="mb-8 flex items-center justify-center gap-2 font-display text-lg font-semibold"
         >
-          <Aperture className="h-6 w-6 text-primary" strokeWidth={1.75} />
+          <BrandMark className="h-6 w-6 text-primary" />
           رنتینو
         </Link>
 

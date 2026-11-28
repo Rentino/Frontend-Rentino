@@ -33,7 +33,7 @@ export function middleware(req: NextRequest) {
   // accessToken
   // refreshToken
   //
-  // তাই lensloop_token ব্যবহার করা যাবে না।
+  // তাই rentino_token ব্যবহার করা যাবে না।
   // =====================================================
 
   const accessToken = req.cookies.get("accessToken")?.value;

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Aperture, LogOut, Moon, Sun, type LucideIcon } from "lucide-react";
+import { LogOut, Moon, Sun, type LucideIcon } from "lucide-react";
 
 import { useTheme } from "@/components/theme-provider";
 import { useAuth } from "@/lib/auth-context";
@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { cn } from "@/lib/utils";
+import { BrandMark } from "@/components/brand-mark";
 
 /* =========================================================
    TYPES
@@ -88,7 +89,7 @@ export function DashboardShell({
           href="/"
           className="flex items-center gap-2 border-b border-border px-6 py-5 font-display text-lg font-semibold"
         >
-          <Aperture className="h-6 w-6 text-primary" strokeWidth={1.75} />
+          <BrandMark className="h-6 w-6 text-primary" />
           رنتینو
         </Link>
 

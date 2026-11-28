@@ -1,8 +1,9 @@
-import { Aperture, Target, Users, Globe2 } from "lucide-react";
+import { Target, Users, Globe2 } from "lucide-react";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { platformStats } from "@/lib/content";
+import { BrandMark } from "@/components/brand-mark";
 
 const values = [
   {
@@ -29,7 +30,7 @@ export default function AboutPage() {
       <main className="flex-1">
         <section className="border-b border-border py-16">
           <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
-            <Aperture className="mx-auto h-10 w-10 text-primary" strokeWidth={1.5} />
+            <BrandMark className="mx-auto h-10 w-10 text-primary" />
             <h1 className="mt-4 font-display text-3xl font-semibold sm:text-4xl">درباره رنتینو</h1>
             <p className="mt-4 text-muted">
               رنتینو، بازارچه آنلاین اجاره کالاست که اجاره‌کنندگان را به تأمین‌کنندگان معتبر
