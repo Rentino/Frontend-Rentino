@@ -178,6 +178,12 @@ export default function CustomerOrdersPage() {
 
   const [submittingReview, setSubmittingReview] = useState(false);
 
+  const [confirmingReturnId, setConfirmingReturnId] = useState<string | null>(
+    null,
+  );
+
+  const [refreshKey, setRefreshKey] = useState(0);
+
   const [reviewedItems, setReviewedItems] = useState<Set<string>>(
     () => new Set(),
   );
@@ -228,7 +234,31 @@ export default function CustomerOrdersPage() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [refreshKey]);
+
+  /* =========================================================
+     Confirm return
+  ========================================================= */
+
+  async function confirmReturn(order: CustomerOrder) {
+    try {
+      setConfirmingReturnId(order.id);
+
+      await api.patch(`/rentals/${order.id}/return`);
+
+      setRefreshKey((key) => key + 1);
+
+      toast.success("بازگشت کالا تأیید شد.");
+    } catch (error) {
+      toast.error(
+        error instanceof ApiRequestError
+          ? error.message
+          : "تأیید بازگشت ممکن نشد.",
+      );
+    } finally {
+      setConfirmingReturnId(null);
+    }
+  }
 
   /* =========================================================
      Review
@@ -411,6 +441,19 @@ export default function CustomerOrdersPage() {
                             >
                               پرداخت کن
                             </Link>
+                          </Button>
+                        )}
+
+                        {order.status === "PICKED_UP" && (
+                          <Button
+                            size="sm"
+                            onClick={() => confirmReturn(order)}
+                            disabled={confirmingReturnId === order.id}
+                          >
+                            {confirmingReturnId === order.id && (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            )}
+                            تأیید بازگشت
                           </Button>
                         )}
 

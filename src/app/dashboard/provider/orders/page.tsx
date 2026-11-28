@@ -104,7 +104,7 @@ interface ProviderOrdersResponse {
 ========================================================= */
 
 const nextAction: Partial<
-  Record<RentalStatus, { label: string; next: RentalStatus }>
+  Record<RentalStatus, { label: string; next?: RentalStatus }>
 > = {
   PLACED: {
     label: "تأیید",
@@ -117,8 +117,7 @@ const nextAction: Partial<
   },
 
   PICKED_UP: {
-    label: "ثبت بازگشت",
-    next: "RETURNED",
+    label: "در انتظار تأیید مشتری",
   },
 };
 
@@ -379,14 +378,15 @@ export default function ProviderOrdersPage() {
     }
 
     const action = nextAction[order.status];
+    const next = action?.next;
 
-    if (!action) {
+    if (!next) {
       return;
     }
 
     try {
       await api.patch(`/provider/orders/${id}`, {
-        status: action.next,
+        status: next,
       });
 
       setOrders((previous) =>
@@ -394,7 +394,7 @@ export default function ProviderOrdersPage() {
           item.id === id
             ? {
                 ...item,
-                status: action.next,
+                status: next,
               }
             : item,
         ),
@@ -523,9 +523,18 @@ export default function ProviderOrdersPage() {
 
                         <TableCell className="text-end">
                           {action ? (
-                            <Button size="sm" onClick={() => advance(order.id)}>
-                              {action.label}
-                            </Button>
+                            action.next ? (
+                              <Button
+                                size="sm"
+                                onClick={() => advance(order.id)}
+                              >
+                                {action.label}
+                              </Button>
+                            ) : (
+                              <span className="text-xs text-muted">
+                                {action.label}
+                              </span>
+                            )
                           ) : (
                             <span className="text-xs text-muted">
                               بدون اقدام
